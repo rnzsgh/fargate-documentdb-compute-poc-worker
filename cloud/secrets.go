@@ -45,7 +45,7 @@ func loadSecret(secretName string) (string, error) {
 	})
 
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return *result.SecretString, nil
