@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/rnzsgh/fargate-documentdb-compute-poc/cloud"
+	"github.com/rnzsgh/fargate-documentdb-compute-poc-worker/cloud"
 
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/mongodb/mongo-go-driver/mongo/options"
