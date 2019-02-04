@@ -39,14 +39,12 @@ func init() {
 func loadSecret(secretName string) (string, error) {
 
 	svc := secretsmanager.New(session.New())
-	result, err := svc.GetSecretValue(&secretsmanager.GetSecretValueInput{
+	if result, err := svc.GetSecretValue(&secretsmanager.GetSecretValueInput{
 		SecretId:     aws.String(secretName),
 		VersionStage: aws.String("AWSCURRENT"),
-	})
-
-	if err != nil {
+	}); err != nil {
 		return "", err
+	} else {
+		return *result.SecretString, nil
 	}
-
-	return *result.SecretString, nil
 }
