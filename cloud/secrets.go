@@ -33,16 +33,7 @@ func init() {
 }
 
 func loadSecret(secretName string) (string, error) {
-
-	/*
-		tr := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-		client := &http.Client{Transport: tr}
-		svc := secretsmanager.New(session.New(), &aws.Config{HTTPClient: client})
-	*/
 	svc := secretsmanager.New(session.New())
-
 	if result, err := svc.GetSecretValue(&secretsmanager.GetSecretValueInput{
 		SecretId:     aws.String(secretName),
 		VersionStage: aws.String("AWSCURRENT"),
