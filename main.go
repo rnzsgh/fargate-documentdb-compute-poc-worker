@@ -11,6 +11,11 @@ import (
 	"github.com/rnzsgh/fargate-documentdb-compute-poc-worker/model"
 )
 
+func init() {
+	flag.Parse()
+	flag.Lookup("logtostderr").Value.Set("true")
+}
+
 type Data struct {
 	Id      *primitive.ObjectID `json:"id" bson:"_id"`
 	X       [][]float32         `json:"x" bson:"x"`
@@ -19,9 +24,6 @@ type Data struct {
 }
 
 func main() {
-	flag.Parse()
-	flag.Lookup("logtostderr").Value.Set("true")
-
 	dataId, err := primitive.ObjectIDFromHex(os.Getenv("DATA_ID"))
 	if err != nil {
 		log.Errorf("Unable to load DATA_ID from env variable - value: %s", os.Getenv("DATA_ID"))
