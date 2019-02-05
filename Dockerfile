@@ -14,6 +14,7 @@ FROM scratch
 
 COPY --from=builder /go/src/github.com/fargate-documentdb-compute-poc-worker/main /main
 COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 USER app
 
 CMD ["/main"]
