@@ -14,9 +14,8 @@ import (
 
 type Data struct {
 	Id      *primitive.ObjectID `json:"id" bson:"_id"`
-	X       [][]float32         `json:"x" bson:"x"`
-	W       [][]float32         `json:"w" bson:"w"`
-	Results [][]float32         `json:"results" bson:"results"`
+	P       []float64           `json:"p" bson:"p"`
+	Entropy float64             `json:"entropy" bson:"entropy"`
 }
 
 func DataFindById(id *primitive.ObjectID) (*Data, error) {
@@ -33,12 +32,12 @@ func dataCollection() *mongo.Collection {
 	return docdb.Client.Database("work").Collection("data")
 }
 
-func DataUpdateResults(id *primitive.ObjectID, results [][]float32) error {
+func DataUpdateEntropy(id *primitive.ObjectID, e float64) error {
 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
 	res, err := dataCollection().UpdateOne(
 		ctx,
 		bson.D{{"_id", id}},
-		bson.D{{"$set", bson.D{{"results", results}}}})
+		bson.D{{"$set", bson.D{{"entopy", e}}}})
 
 	if err == nil {
 		if res.MatchedCount != 1 && res.ModifiedCount != 1 {

@@ -13,33 +13,56 @@ import (
 	"github.com/mongodb/mongo-go-driver/mongo/readpref"
 
 	log "github.com/golang/glog"
+	queue "github.com/rnzsgh/documentdb-queue"
 )
 
 var Client *mongo.Client
+
+var TaskReceiveQueue *queue.Queue
+var TaskCompletedQueue *queue.Queue
 
 func init() {
 
 	endpoint := os.Getenv("DOCUMENT_DB_ENDPOINT")
 	port := os.Getenv("DOCUMENT_DB_PORT")
 	user := os.Getenv("DOCUMENT_DB_USER")
-	pemFile := os.Getenv("DOCUMENT_DB_PEM")
+	caFile := os.Getenv("DOCUMENT_DB_PEM")
 
 	password := cloud.Secrets.DatabasePassword
 
-	connectionUri := fmt.Sprintf("mongodb://%s:%s@%s:%s/test?ssl=true", user, password, endpoint, port)
+	connectionUri := fmt.Sprintf("mongodb://%s:%s@%s:%s/work?ssl=true", user, password, endpoint, port)
 
 	if len(os.Getenv("LOCAL")) == 0 {
 		connectionUri = connectionUri + "&replicaSet=rs0"
 	}
 
 	var err error
+	if TaskReceiveQueue, err = queue.NewQueue(
+		"work",
+		"dispatchQueue",
+		connectionUri,
+		caFile, 5*time.Second,
+	); err != nil {
+		log.Errorf("Unable to create work dispatch queue - endpoint: %s - reason: %v", endpoint, err)
+	}
+
+	if TaskCompletedQueue, err = queue.NewQueue(
+		"work",
+		"responseQueue",
+		connectionUri,
+		caFile,
+		5*time.Second,
+	); err != nil {
+		log.Errorf("Unable to create work response queue - endpoint: %s - reason: %v", endpoint, err)
+	}
+
 	Client, err = mongo.NewClientWithOptions(
 		connectionUri,
 		options.Client().SetSSL(
 			&options.SSLOpt{
 				Enabled:  true,
 				Insecure: true,
-				CaFile:   pemFile,
+				CaFile:   caFile,
 			},
 		),
 	)
